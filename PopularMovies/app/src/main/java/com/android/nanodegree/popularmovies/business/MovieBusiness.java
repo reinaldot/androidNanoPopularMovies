@@ -1,5 +1,7 @@
 package com.android.nanodegree.popularmovies.business;
 
+import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Movie;
@@ -7,18 +9,25 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 
+import com.android.nanodegree.popularmovies.MovieFragment;
+import com.android.nanodegree.popularmovies.model.MoviePoster;
 import com.android.nanodegree.popularmovies.repository.MovieDBRepository;
 import com.android.nanodegree.popularmovies.ui.adapter.MoviePosterAdapter;
 import com.android.nanodegree.popularmovies.util.JsonUtil;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by rhatori on 20/12/2016.
@@ -26,61 +35,73 @@ import java.util.HashMap;
 
 public class MovieBusiness {
 
-    AsyncMovieDBRepository asyncMovieDBRepository = new AsyncMovieDBRepository();
+    private MoviePosterAdapter moviePosterAdapter = null;
+
+    public MovieBusiness(Context context, ListView listView, MoviePosterAdapter moviePosterAdapter) {
+        this.context = context;
+        this.listView = listView;
+        this.moviePosterAdapter = moviePosterAdapter;
+    }
+
+    Context context;
+    AsyncMovieDBRepository asyncMovieDBRepository = new AsyncMovieDBRepository(this.listView, moviePosterAdapter);
     final String BASE_POSTER_PATH_URL = "https://image.tmdb.org/t/p/";
-    final String MOVIE_POSTER_SIZE_500 = "w500";
-    private MoviePosterAdapter mPosterAdapter;
-    private ImageView imageView;
+    final String MOVIE_POSTER_SIZE_185 = "w185";
+    private ListView listView;
 
-    public MovieBusiness(ImageView imageView)
-    {
-        this.imageView = imageView;
+    public void getMovieListBySettings() {
+        asyncMovieDBRepository.execute(listView);
     }
 
-    public JSONObject getMovieListBySettings() {
-        asyncMovieDBRepository.execute();
-        return new JSONObject();
-    }
+    public class AsyncMovieDBRepository extends AsyncTask<ListView, Void, ArrayList<MoviePoster>> {
 
-    public class AsyncMovieDBRepository extends AsyncTask<Void, Void, HashMap<String, Bitmap>> {
+        private MoviePosterAdapter moviePosterAdapter;
+
+        public AsyncMovieDBRepository(ListView listView, MoviePosterAdapter moviePosterAdapter) {
+            this.listView = listView;
+            this.moviePosterAdapter = moviePosterAdapter;
+        }
+
+        private ListView listView;
 
         @Override
-        protected HashMap<String, Bitmap> doInBackground(Void... voids) {
+        protected ArrayList<MoviePoster> doInBackground(ListView... listViews) {
+            this.listView = listViews[0];
             MovieDBRepository repository = new MovieDBRepository();
             InputStream inputStream = repository.getMovieListBySettings();
             JSONObject json = JsonUtil.convertInputStreamToJson(inputStream);
-            HashMap<String, Bitmap> posterMap = null;
-
+            ArrayList<MoviePoster> moviePosters = new ArrayList<>();
+            MoviePoster moviePoster;
             try {
                 JSONArray jsonArray = json.getJSONArray("results");
-                posterMap = new HashMap<>();
 
                 for (int i = 0; i < jsonArray.length(); i++) {
                     String movieId = jsonArray.getJSONObject(i).getString("id");
                     String posterPath = jsonArray.getJSONObject(i).getString("poster_path");
                     Uri uri = Uri.parse(BASE_POSTER_PATH_URL)
                             .buildUpon()
-                            .appendPath(MOVIE_POSTER_SIZE_500)
+                            .appendPath(MOVIE_POSTER_SIZE_185)
                             .appendPath(posterPath)
                             .build();
 
-                    URL url = new URL(uri.toString());
-                    URLConnection urlConnection = url.openConnection();
-                    InputStream imageStream = urlConnection.getInputStream();
-                    Bitmap image = BitmapFactory.decodeStream(imageStream);
-                    posterMap.put(movieId, image);
+                    moviePoster = new MoviePoster();
+                    moviePoster.setMovieId(movieId);
+                    moviePoster.setPosterImageURL(uri.toString());
+                    moviePosters.add(moviePoster);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            finally {
-                return posterMap;
-            }
+            return moviePosters;
         }
 
         @Override
-        protected void onPostExecute(HashMap<String, Bitmap> posters) {
-            imageView.setImageBitmap(posters.get(1));
+        protected void onPostExecute(ArrayList<MoviePoster> moviePosters) {
+            moviePosterAdapter = new MoviePosterAdapter(context, moviePosters);
+            listView.setAdapter(moviePosterAdapter);
+            moviePosterAdapter.notifyDataSetChanged();
         }
     }
 }

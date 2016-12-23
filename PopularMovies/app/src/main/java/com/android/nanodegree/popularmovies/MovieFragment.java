@@ -31,23 +31,16 @@ public class MovieFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private static MovieBusiness movieBusiness;
+    public static MoviePosterAdapter moviePosterAdapter = null;
+    public static ListView movieListView = null;
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    private ArrayAdapter<Bitmap> mMoviePosterAdapter;
 
     private OnFragmentInteractionListener mListener;
 
     public MovieFragment() {
         // Required empty public constructor
-    }
-
-    private void updateMoviePoster() {
-        //PosterTask posterTask = new PosterTask();
-
-        //posterTask.execute("","","");
     }
 
     /**
@@ -71,10 +64,6 @@ public class MovieFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -83,9 +72,8 @@ public class MovieFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_movie, container, false);
 
-        ListView movies = (ListView) view.findViewById(R.id.listview_movies);
-        MovieBusiness movieBusiness = new MovieBusiness((ImageView)movies.findViewById(R.id.imageview_poster));
-
+        movieListView = (ListView) view.findViewById(R.id.listview_movies);
+        movieBusiness = new MovieBusiness(getContext(), movieListView, moviePosterAdapter);
         movieBusiness.getMovieListBySettings();
 
         return view;

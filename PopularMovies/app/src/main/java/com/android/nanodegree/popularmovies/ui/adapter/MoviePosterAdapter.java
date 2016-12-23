@@ -2,6 +2,7 @@ package com.android.nanodegree.popularmovies.ui.adapter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Movie;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
@@ -10,9 +11,15 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import com.android.nanodegree.popularmovies.MovieFragment;
 import com.android.nanodegree.popularmovies.R;
+import com.android.nanodegree.popularmovies.model.MoviePoster;
+import com.squareup.picasso.Picasso;
+
+import java.util.ArrayList;
 
 /**
  * Created by rhatori on 21/12/2016.
@@ -20,18 +27,17 @@ import com.android.nanodegree.popularmovies.R;
 
 public class MoviePosterAdapter extends BaseAdapter {
 
-    private Activity context;
-    String[] urls;
+    private Context context;
+    private ArrayList<MoviePoster> moviePosters;
 
-//    public MoviePosterAdapter(Activity context, int resource, String[] objects) {
-//        super(context, resource, objects);
-//        this.context = context;
-//        this.urls = objects;
-//    }
+    public MoviePosterAdapter(Context context, ArrayList<MoviePoster> moviePosters) {
+        this.context = context;
+        this.moviePosters = moviePosters;
+    }
 
     @Override
     public int getCount() {
-        return 0;
+        return moviePosters.size();
     }
 
     @Override
@@ -45,23 +51,12 @@ public class MoviePosterAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int i, View view, ViewGroup viewGroup) {
-        LayoutInflater inflater = context.getLayoutInflater();
-        View rowView = inflater.inflate(R.layout.list_item, null, true);
-        ImageView imageView = (ImageView) rowView.findViewById(R.id.imageview_poster);
-        imageView.setImageURI(Uri.parse(urls[i]));
-
-        return rowView;
+    public View getView(int position, View view, ViewGroup viewGroup) {
+        LayoutInflater inflater = ((Activity)context).getLayoutInflater();
+        View movieLayout = inflater.inflate(R.layout.list_item, null, true);
+        //ListView rowView = (ListView)view;
+        ImageView imageView = (ImageView)movieLayout.findViewById(R.id.imageview_poster);
+        Picasso.with(context).load(moviePosters.get(position).getPosterImageURL()).into(imageView);
+        return imageView;
     }
-
-//    @NonNull
-//    @Override
-//    public View getView(int position, View convertView, ViewGroup parent) {
-//        LayoutInflater inflater = context.getLayoutInflater();
-//        View rowView = inflater.inflate(R.layout.list_item, null, true);
-//        ImageView imageView = (ImageView) rowView.findViewById(R.id.imageview_poster);
-//        imageView.setImageURI(Uri.parse(urls[position]));
-//
-//        return rowView;
-//    }
 }
