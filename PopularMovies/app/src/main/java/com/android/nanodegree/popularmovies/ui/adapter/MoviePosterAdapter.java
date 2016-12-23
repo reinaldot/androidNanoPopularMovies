@@ -54,9 +54,8 @@ public class MoviePosterAdapter extends BaseAdapter {
     public View getView(int position, View view, ViewGroup viewGroup) {
         LayoutInflater inflater = ((Activity)context).getLayoutInflater();
         View movieLayout = inflater.inflate(R.layout.list_item, null, true);
-        //ListView rowView = (ListView)view;
         ImageView imageView = (ImageView)movieLayout.findViewById(R.id.imageview_poster);
         Picasso.with(context).load(moviePosters.get(position).getPosterImageURL()).into(imageView);
-        return imageView;
+        return movieLayout;
     }
 }
