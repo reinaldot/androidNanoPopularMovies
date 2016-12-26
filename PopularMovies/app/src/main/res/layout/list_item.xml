@@ -1,15 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
 
-    <ImageView
-        android:id="@+id/imageview_poster"
-        android:layout_width="match_parent"
+    <ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/imageview_poster_left"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:padding="@dimen/movie_fragment_poster_padding">
-    </ImageView>
+        android:layout_weight="1"
+        android:adjustViewBounds="true"></ImageView>
+
+    <TextView
+        android:id="@+id/textview_poster_error_left"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:minHeight="250dp"
+        android:layout_weight="1"
+        android:visibility="gone"
+        android:textAlignment="center"
+        android:textSize="@dimen/movie_poster_error_title_size"/>
+
+    <ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/imageview_poster_right"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:adjustViewBounds="true"></ImageView>
+
+    <TextView
+        android:id="@+id/textview_poster_error_right"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:minHeight="250dp"
+        android:layout_weight="1"
+        android:visibility="gone"
+        android:textAlignment="center"
+        android:textSize="@dimen/movie_poster_error_title_size"/>
 
 </LinearLayout>

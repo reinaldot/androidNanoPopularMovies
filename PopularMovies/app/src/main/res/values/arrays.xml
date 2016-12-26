@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pref_sort_options_label">
+        <item>@string/pref_the_movie_db_sort_by_popularity_label</item>
+        <item>@string/pref_the_movie_db_sort_by_rate_label</item>
+    </string-array>
+    <string-array name="pref_sort_options_value">
+        <item>@string/pref_the_movie_db_sort_by_popularity_value</item>
+        <item>@string/pref_the_movie_db_sort_by_rate_value</item>
+    </string-array>
+    <string-array name="pref_order_options_label">
+        <item>@string/pref_the_movie_db_order_by_ascending_label</item>
+        <item>@string/pref_the_movie_db_order_by_descending_label</item>
+    </string-array>
+    <string-array name="pref_order_options_value">
+        <item>@string/pref_the_movie_db_order_by_ascending_value</item>
+        <item>@string/pref_the_movie_db_order_by_descending_value</item>
+    </string-array>
+</resources>

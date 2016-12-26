@@ -1,33 +1,21 @@
 package com.android.nanodegree.popularmovies.business;
 
-import android.app.Activity;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Movie;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
 
-import com.android.nanodegree.popularmovies.MovieFragment;
 import com.android.nanodegree.popularmovies.model.MoviePoster;
 import com.android.nanodegree.popularmovies.repository.MovieDBRepository;
 import com.android.nanodegree.popularmovies.ui.adapter.MoviePosterAdapter;
 import com.android.nanodegree.popularmovies.util.JsonUtil;
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 /**
  * Created by rhatori on 20/12/2016.
@@ -67,7 +55,7 @@ public class MovieBusiness {
         @Override
         protected ArrayList<MoviePoster> doInBackground(ListView... listViews) {
             this.listView = listViews[0];
-            MovieDBRepository repository = new MovieDBRepository();
+            MovieDBRepository repository = new MovieDBRepository(context);
             InputStream inputStream = repository.getMovieListBySettings();
             JSONObject json = JsonUtil.convertInputStreamToJson(inputStream);
             ArrayList<MoviePoster> moviePosters = new ArrayList<>();
@@ -77,7 +65,8 @@ public class MovieBusiness {
 
                 for (int i = 0; i < jsonArray.length(); i++) {
                     String movieId = jsonArray.getJSONObject(i).getString("id");
-                    String posterPath = jsonArray.getJSONObject(i).getString("poster_path");
+                    String posterPath = jsonArray.getJSONObject(i).getString("poster_path").replace("/", "");
+                    String movieName = jsonArray.getJSONObject(i).getString("title");
                     Uri uri = Uri.parse(BASE_POSTER_PATH_URL)
                             .buildUpon()
                             .appendPath(MOVIE_POSTER_SIZE_185)
@@ -87,6 +76,7 @@ public class MovieBusiness {
                     moviePoster = new MoviePoster();
                     moviePoster.setMovieId(movieId);
                     moviePoster.setPosterImageURL(uri.toString());
+                    moviePoster.setMovieName(movieName);
                     moviePosters.add(moviePoster);
                 }
             } catch (JSONException e) {
