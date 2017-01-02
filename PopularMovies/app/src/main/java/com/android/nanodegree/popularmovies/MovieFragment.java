@@ -11,7 +11,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
-import android.widget.ListView;
+
 import com.android.nanodegree.popularmovies.business.MovieBusiness;
 import com.android.nanodegree.popularmovies.ui.adapter.MoviePosterAdapter;
 
@@ -34,9 +34,6 @@ public class MovieFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-//        View view = inflater.inflate(R.layout.fragment_movie, container, false);
-//
-//        movieListView = (ListView) view.findViewById(R.id.listview_movies);
         View view = inflater.inflate(R.layout.fragment_movie_grid, container, false);
         movieGridView = (GridView) view.findViewById(R.id.gridview_movies);
         movieBusiness = new MovieBusiness(getContext(), movieGridView, moviePosterAdapter);

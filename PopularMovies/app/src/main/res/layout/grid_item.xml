@@ -16,7 +16,7 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:minHeight="250dp"
+        android:minHeight="@dimen/movie_poster_minHeight"
         android:textAlignment="center"
         android:textSize="@dimen/movie_poster_error_title_size"
         android:visibility="gone" />
