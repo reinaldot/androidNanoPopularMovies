@@ -3,6 +3,7 @@ package com.android.nanodegree.popularmovies.business;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.widget.GridView;
 import android.widget.ListView;
 
 import com.android.nanodegree.popularmovies.model.MoviePoster;
@@ -25,36 +26,36 @@ public class MovieBusiness {
 
     private MoviePosterAdapter moviePosterAdapter = null;
 
-    public MovieBusiness(Context context, ListView listView, MoviePosterAdapter moviePosterAdapter) {
+    public MovieBusiness(Context context, GridView gridView, MoviePosterAdapter moviePosterAdapter) {
         this.context = context;
-        this.listView = listView;
+        this.gridView = gridView;
         this.moviePosterAdapter = moviePosterAdapter;
     }
 
     Context context;
-    AsyncMovieDBRepository asyncMovieDBRepository = new AsyncMovieDBRepository(this.listView, moviePosterAdapter);
+    AsyncMovieDBRepository asyncMovieDBRepository = new AsyncMovieDBRepository(this.gridView, moviePosterAdapter);
     final String BASE_POSTER_PATH_URL = "https://image.tmdb.org/t/p/";
     final String MOVIE_POSTER_SIZE_185 = "w185";
-    private ListView listView;
+    private GridView gridView;
 
     public void getMovieListBySettings() {
-        asyncMovieDBRepository.execute(listView);
+        asyncMovieDBRepository.execute(gridView);
     }
 
-    public class AsyncMovieDBRepository extends AsyncTask<ListView, Void, ArrayList<MoviePoster>> {
+    public class AsyncMovieDBRepository extends AsyncTask<GridView, Void, ArrayList<MoviePoster>> {
 
         private MoviePosterAdapter moviePosterAdapter;
 
-        public AsyncMovieDBRepository(ListView listView, MoviePosterAdapter moviePosterAdapter) {
-            this.listView = listView;
+        public AsyncMovieDBRepository(GridView gridView, MoviePosterAdapter moviePosterAdapter) {
+            this.gridView = gridView;
             this.moviePosterAdapter = moviePosterAdapter;
         }
 
-        private ListView listView;
+        private GridView gridView;
 
         @Override
-        protected ArrayList<MoviePoster> doInBackground(ListView... listViews) {
-            this.listView = listViews[0];
+        protected ArrayList<MoviePoster> doInBackground(GridView... gridViews) {
+            this.gridView = gridViews[0];
             MovieDBRepository repository = new MovieDBRepository(context);
             InputStream inputStream = repository.getMovieListBySettings();
             JSONObject json = JsonUtil.convertInputStreamToJson(inputStream);
@@ -90,7 +91,7 @@ public class MovieBusiness {
         @Override
         protected void onPostExecute(ArrayList<MoviePoster> moviePosters) {
             moviePosterAdapter = new MoviePosterAdapter(context, moviePosters);
-            listView.setAdapter(moviePosterAdapter);
+            gridView.setAdapter(moviePosterAdapter);
             moviePosterAdapter.notifyDataSetChanged();
         }
     }

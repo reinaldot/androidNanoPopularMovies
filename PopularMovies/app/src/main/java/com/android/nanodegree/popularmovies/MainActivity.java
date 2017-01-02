@@ -2,6 +2,7 @@ package com.android.nanodegree.popularmovies;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
@@ -27,8 +28,15 @@ public class MainActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case SETTING_CHANGED_RESULT:
-                    recreate();
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            recreate();
+                        }
+                    }, 0);
             }
         }
     }
 }
+

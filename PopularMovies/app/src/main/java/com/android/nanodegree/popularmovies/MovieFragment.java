@@ -10,6 +10,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridView;
 import android.widget.ListView;
 import com.android.nanodegree.popularmovies.business.MovieBusiness;
 import com.android.nanodegree.popularmovies.ui.adapter.MoviePosterAdapter;
@@ -18,7 +19,7 @@ import com.android.nanodegree.popularmovies.ui.adapter.MoviePosterAdapter;
 public class MovieFragment extends Fragment {
     private static MovieBusiness movieBusiness;
     public static MoviePosterAdapter moviePosterAdapter = null;
-    public static ListView movieListView = null;
+    public static GridView movieGridView = null;
     private final int SETTING_CHANGED_RESULT = 1;
 
     public MovieFragment() {
@@ -33,10 +34,12 @@ public class MovieFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_movie, container, false);
-
-        movieListView = (ListView) view.findViewById(R.id.listview_movies);
-        movieBusiness = new MovieBusiness(getContext(), movieListView, moviePosterAdapter);
+//        View view = inflater.inflate(R.layout.fragment_movie, container, false);
+//
+//        movieListView = (ListView) view.findViewById(R.id.listview_movies);
+        View view = inflater.inflate(R.layout.fragment_movie_grid, container, false);
+        movieGridView = (GridView) view.findViewById(R.id.gridview_movies);
+        movieBusiness = new MovieBusiness(getContext(), movieGridView, moviePosterAdapter);
         movieBusiness.getMovieListBySettings();
 
         return view;

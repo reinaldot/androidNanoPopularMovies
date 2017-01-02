@@ -28,30 +28,23 @@ public class MovieDBRepository {
     }
 
 
-    private final String BASE_URL_THE_MOVIE_DB_API = "https://api.themoviedb.org/3/discover/movie?";
+    private final String BASE_URL_THE_MOVIE_DB_API = "https://api.themoviedb.org/3/movie";
+
 
     public InputStream getMovieListBySettings() {
-        HttpURLConnection urlConnection = null;
+        HttpURLConnection urlConnection;
         InputStream inputStream = null;
 
         final String API_KEY = "api_key";
-        final String LANGUAGE = "language";
-        final String SORT_BY = "sort_by";
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         String defaultSort = context.getResources().getString(R.string.pref_the_movie_db_sort_by_popularity_value);
         String sortValue = preferences.getString(context.getString(R.string.pref_the_movie_db_sort_key), defaultSort);
 
-        String defaultOrder = context.getResources().getString(R.string.pref_the_movie_db_order_by_descending_value);
-        String orderValue = preferences.getString(context.getString(R.string.pref_the_movie_db_order_key), defaultOrder);
-
-        String sortByValue = String.format(context.getString(R.string.pref_the_movie_db_sort_order_format_string), sortValue, orderValue);
-
         Uri uri = Uri.parse(BASE_URL_THE_MOVIE_DB_API)
                 .buildUpon()
+                .appendPath(sortValue)
                 .appendQueryParameter(API_KEY, BuildConfig.THE_MOVIE_DB_API_KEY)
-                .appendQueryParameter(LANGUAGE, "EN_US")
-                .appendQueryParameter(SORT_BY, sortByValue)
                 .build();
 
         try {
