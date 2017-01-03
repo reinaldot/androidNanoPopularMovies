@@ -12,7 +12,7 @@ import java.io.InputStreamReader;
  */
 
 public class JsonUtil {
-    public static JSONObject convertInputStreamToJson(InputStream stream) {
+    public static JSONObject getJSONObject(InputStream stream) {
         BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
         StringBuilder stringBuilder = new StringBuilder();
         String data;

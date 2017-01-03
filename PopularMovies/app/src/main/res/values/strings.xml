@@ -11,4 +11,12 @@
     <string name="pref_the_movie_db_sort_by_popularity_value">popular</string>
     <string name="pref_the_movie_db_sort_by_top_rated_label">Top Rated</string>
     <string name="pref_the_movie_db_sort_by_top_rated_value">top_rated</string>
+
+    <string name="format_runtime">
+        %1smin
+    </string>
+
+    <string name="format_vote_average">
+        %1s/10
+    </string>
 </resources>

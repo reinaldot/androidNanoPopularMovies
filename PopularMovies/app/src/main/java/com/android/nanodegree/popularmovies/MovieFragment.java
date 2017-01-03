@@ -10,16 +10,19 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.android.nanodegree.popularmovies.business.MovieBusiness;
+import com.android.nanodegree.popularmovies.model.MoviePoster;
 import com.android.nanodegree.popularmovies.ui.adapter.MoviePosterAdapter;
 
 
 public class MovieFragment extends Fragment {
-    private static MovieBusiness movieBusiness;
+    private MovieBusiness movieBusiness;
     public static MoviePosterAdapter moviePosterAdapter = null;
     public static GridView movieGridView = null;
+    public static final String MOVIE_ID_KEY = "1";
     private final int SETTING_CHANGED_RESULT = 1;
 
     public MovieFragment() {
@@ -36,7 +39,20 @@ public class MovieFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_movie_grid, container, false);
         movieGridView = (GridView) view.findViewById(R.id.gridview_movies);
-        movieBusiness = new MovieBusiness(getContext(), movieGridView, moviePosterAdapter);
+        movieGridView.setOnItemClickListener(
+                new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                        GridView gridView = (GridView)adapterView;
+                        MoviePoster poster = (MoviePoster)gridView.getAdapter().getItem(i);
+                        String movieID = poster.getMovieID();
+                        Intent intent = new Intent(getActivity(), MovieDetailActivity.class);
+                        intent.putExtra(MOVIE_ID_KEY, movieID);
+                        startActivity(intent);
+                    }
+                }
+        );
+        movieBusiness = new MovieBusiness(getContext(), moviePosterAdapter);
         movieBusiness.getMovieListBySettings();
 
         return view;
