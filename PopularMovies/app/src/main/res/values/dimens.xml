@@ -5,4 +5,10 @@
     <dimen name="movie_fragment_poster_padding">30dp</dimen>
     <dimen name="movie_poster_error_title_size">20sp</dimen>
     <dimen name="movie_poster_minHeight">250dp</dimen>
+    <dimen name="movie_detail_padding">20dp</dimen>
+    <dimen name="movie_detail_divider_padding">10dp</dimen>
+    <dimen name="movie_detail_releasedate_text_size">30sp</dimen>
+    <dimen name="movie_detail_runtime_text_size">20sp</dimen>
+    <dimen name="movie_detail_vote_average_text_size">15sp</dimen>
+    <dimen name="movie_detail_text_padding">3dp</dimen>
 </resources>

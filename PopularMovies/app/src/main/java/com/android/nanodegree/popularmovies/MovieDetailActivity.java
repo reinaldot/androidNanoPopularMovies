@@ -1,14 +1,8 @@
 package com.android.nanodegree.popularmovies;
 
-import android.content.Context;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.NotificationCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.AttributeSet;
-import android.view.View;
 
 public class MovieDetailActivity extends AppCompatActivity {
 
@@ -28,5 +22,3 @@ public class MovieDetailActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayShowHomeEnabled(true);
     }
 }
-
-
