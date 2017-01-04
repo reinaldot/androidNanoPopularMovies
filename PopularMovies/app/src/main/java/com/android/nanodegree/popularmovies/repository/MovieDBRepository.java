@@ -1,13 +1,9 @@
 package com.android.nanodegree.popularmovies.repository;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.Uri;
-import android.preference.PreferenceManager;
 
 import com.android.nanodegree.popularmovies.BuildConfig;
-import com.android.nanodegree.popularmovies.R;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -22,9 +18,9 @@ public class MovieDBRepository {
 
     private final String BASE_URL_THE_MOVIE_DB_API = "https://api.themoviedb.org/3/movie";
 
-    public InputStream getMovieListBySettings(String sortValue) {
+    public InputStream getMovieListBySettings(String sortValue) throws IOException {
         HttpURLConnection urlConnection;
-        InputStream inputStream = null;
+        InputStream inputStream;
 
         final String API_KEY = "api_key";
 
@@ -34,25 +30,16 @@ public class MovieDBRepository {
                 .appendQueryParameter(API_KEY, BuildConfig.THE_MOVIE_DB_API_KEY)
                 .build();
 
-        try {
-            URL url = new URL(uri.toString());
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
-            inputStream = urlConnection.getInputStream();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        finally {
-            return inputStream;
-        }
+        URL url = new URL(uri.toString());
+        urlConnection = (HttpURLConnection) url.openConnection();
+        urlConnection.setRequestMethod("GET");
+        urlConnection.connect();
+        inputStream = urlConnection.getInputStream();
+
+        return inputStream;
     }
 
-    public InputStream getMovieDetailByMovieID(String movieID) {
+    public InputStream getMovieDetailByMovieID(String movieID) throws IOException {
         HttpURLConnection urlConnection;
         InputStream inputStream = null;
 
@@ -64,21 +51,12 @@ public class MovieDBRepository {
                 .appendQueryParameter(API_KEY, BuildConfig.THE_MOVIE_DB_API_KEY)
                 .build();
 
-        try {
-            URL url = new URL(uri.toString());
-            urlConnection = (HttpURLConnection) url.openConnection();
-            urlConnection.setRequestMethod("GET");
-            urlConnection.connect();
-            inputStream = urlConnection.getInputStream();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        finally {
-            return inputStream;
-        }
+        URL url = new URL(uri.toString());
+        urlConnection = (HttpURLConnection) url.openConnection();
+        urlConnection.setRequestMethod("GET");
+        urlConnection.connect();
+        inputStream = urlConnection.getInputStream();
+
+        return inputStream;
     }
 }

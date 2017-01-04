@@ -9,6 +9,7 @@ import android.preference.PreferenceManager;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.nanodegree.popularmovies.R;
 import com.android.nanodegree.popularmovies.model.MovieDetail;
@@ -22,7 +23,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 
 /**
@@ -69,11 +72,37 @@ public class MovieBusiness {
         protected ArrayList<MoviePoster> doInBackground(String... sortValues) {
             String sortValue = sortValues[0];
             MovieDBRepository repository = new MovieDBRepository();
-            InputStream inputStream = repository.getMovieListBySettings(sortValue);
-            JSONObject json = JsonUtil.getJSONObject(inputStream);
-            ArrayList<MoviePoster> moviePosters = new ArrayList<>();
-            MoviePoster moviePoster;
+            InputStream inputStream = null;
             try {
+                inputStream = repository.getMovieListBySettings(sortValue);
+                if (inputStream == null) {
+                    return null;
+                }
+            } catch (MalformedURLException e) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context, String.format(context.getString(R.string.format_error_base_message), "Malformed URL"), Toast.LENGTH_SHORT).show();
+                    }
+                });
+                return null;
+            } catch (IOException e) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context, String.format(context.getString(R.string.format_error_base_message), "Network connectivity"), Toast.LENGTH_SHORT).show();
+                    }
+                });
+                return null;
+            }
+
+            ArrayList<MoviePoster> moviePosters;
+
+            try {
+            JSONObject json = JsonUtil.getJSONObject(inputStream);
+            moviePosters = new ArrayList<>();
+            MoviePoster moviePoster;
+
                 JSONArray jsonArray = json.getJSONArray("results");
 
                 for (int i = 0; i < jsonArray.length(); i++) {
@@ -94,8 +123,22 @@ public class MovieBusiness {
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context, String.format(context.getString(R.string.format_error_base_message), "JSON"), Toast.LENGTH_SHORT).show();
+                    }
+                });
+                return null;
             } catch (Exception e) {
                 e.printStackTrace();
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context, String.format(context.getString(R.string.format_error_base_message), "unhandled"), Toast.LENGTH_SHORT).show();
+                    }
+                });
+                return null;
             }
             return moviePosters;
         }
@@ -103,7 +146,7 @@ public class MovieBusiness {
         @Override
         protected void onPostExecute(ArrayList<MoviePoster> moviePosters) {
             moviePosterAdapter = new MoviePosterAdapter(context, moviePosters);
-            GridView gridView = (GridView)((Activity)context).findViewById(R.id.gridview_movies);
+            GridView gridView = (GridView) ((Activity) context).findViewById(R.id.gridview_movies);
             gridView.setAdapter(moviePosterAdapter);
             moviePosterAdapter.notifyDataSetChanged();
         }
@@ -114,65 +157,111 @@ public class MovieBusiness {
         protected ArrayList<MovieDetail> doInBackground(String... movieIDs) {
             String movieID = movieIDs[0];
             MovieDBRepository repository = new MovieDBRepository();
-            InputStream inputStream = repository.getMovieDetailByMovieID(movieID);
-            JSONObject json = JsonUtil.getJSONObject(inputStream);
-            ArrayList<MovieDetail> movieDetails = new ArrayList<>();
-            MovieDetail movieDetail;
+            InputStream inputStream;
+
             try {
-                    String movieId = json.getString("id");
-                    String posterPath = json.getString("poster_path").replace("/", "");
-                    String movieName = json.getString("title");
-                    String releaseDate = json.getString("release_date");
-                    String runtime = json.getString("runtime");
-                    String voteAverage = json.getString("vote_average");
-                    String overview = json.getString("overview");
+                inputStream = repository.getMovieDetailByMovieID(movieID);
+
+            } catch (MalformedURLException e) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context, String.format(context.getString(R.string.format_error_base_message), "Malformed URL"), Toast.LENGTH_SHORT).show();
+                    }
+                });
+                return null;
+            } catch (IOException e) {
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context, String.format(context.getString(R.string.format_error_base_message), "Network connectivity"), Toast.LENGTH_SHORT).show();
+                    }
+                });
+                return null;
+            }
+
+            ArrayList<MovieDetail> movieDetails;
+
+            try {
+            JSONObject json = JsonUtil.getJSONObject(inputStream);
+            movieDetails = new ArrayList<>();
+            MovieDetail movieDetail;
+
+                String movieId = json.getString("id");
+                String posterPath = json.getString("poster_path").replace("/", "");
+                String movieName = json.getString("title");
+                String releaseDate = json.getString("release_date");
+                String runtime = json.getString("runtime");
+                String voteAverage = json.getString("vote_average");
+                String overview = json.getString("overview");
 
 
-                    Uri uri = Uri.parse(BASE_POSTER_PATH_URL)
-                            .buildUpon()
-                            .appendPath(MOVIE_POSTER_SIZE_185)
-                            .appendPath(posterPath)
-                            .build();
+                Uri uri = Uri.parse(BASE_POSTER_PATH_URL)
+                        .buildUpon()
+                        .appendPath(MOVIE_POSTER_SIZE_185)
+                        .appendPath(posterPath)
+                        .build();
 
-                    movieDetail = new MovieDetail();
-                    movieDetail.setMovieID(movieId);
-                    movieDetail.setPosterImageURL(uri.toString());
-                    movieDetail.setTitle(movieName);
-                    movieDetail.setReleaseDate(releaseDate);
-                    movieDetail.setRuntime(runtime);
-                    movieDetail.setVoteAverage(voteAverage);
-                    movieDetail.setOverview(overview);
+                movieDetail = new MovieDetail();
+                movieDetail.setMovieID(movieId);
+                movieDetail.setPosterImageURL(uri.toString());
+                movieDetail.setTitle(movieName);
+                movieDetail.setReleaseDate(releaseDate);
+                movieDetail.setRuntime(runtime);
+                movieDetail.setVoteAverage(voteAverage);
+                movieDetail.setOverview(overview);
 
-                    movieDetails.add(movieDetail);
+                movieDetails.add(movieDetail);
             } catch (JSONException e) {
                 e.printStackTrace();
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context, String.format(context.getString(R.string.format_error_base_message), "JSON"), Toast.LENGTH_SHORT).show();
+                    }
+                });
+                return null;
             } catch (Exception e) {
                 e.printStackTrace();
+                ((Activity) context).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(context, String.format(context.getString(R.string.format_error_base_message), "unhandled"), Toast.LENGTH_SHORT).show();
+                    }
+                });
+                return null;
             }
             return movieDetails;
         }
 
         @Override
         protected void onPostExecute(ArrayList<MovieDetail> movieDetails) {
-            MovieDetail movieDetail = movieDetails.get(0);
-            Activity activity = ((Activity)context);
+            try {
+                MovieDetail movieDetail = movieDetails.get(0);
+                Activity activity = ((Activity) context);
 
-            activity.setTitle(movieDetail.getTitle());
+                activity.setTitle(movieDetail.getTitle());
 
-            ImageView imageView = (ImageView)activity.findViewById(R.id.imageview_poster);
-            Picasso.with(context).load(movieDetail.getPosterImageURL()).into(imageView);
+                ImageView imageView = (ImageView) activity.findViewById(R.id.imageview_poster);
+                Picasso.with(context).load(movieDetail.getPosterImageURL()).into(imageView);
 
-            TextView movieYear = (TextView)activity.findViewById(R.id.textview_movie_year);
-            movieYear.setText(movieDetail.getReleaseDate().substring(0,4));
+                TextView movieYear = (TextView) activity.findViewById(R.id.textview_movie_year);
+                movieYear.setText(movieDetail.getReleaseDate().substring(0, 4));
 
-            TextView runtime = (TextView)activity.findViewById(R.id.textview_movie_runtime);
-            runtime.setText(String.format(activity.getString(R.string.format_runtime), movieDetail.getRuntime()));
+                TextView runtime = (TextView) activity.findViewById(R.id.textview_movie_runtime);
+                runtime.setText(String.format(activity.getString(R.string.format_runtime), movieDetail.getRuntime()));
 
-            TextView voteAverage = (TextView)activity.findViewById(R.id.textview_movie_vote_average);
-            voteAverage.setText(String.format(activity.getString(R.string.format_vote_average), movieDetail.getVoteAverage()));
+                TextView voteAverage = (TextView) activity.findViewById(R.id.textview_movie_vote_average);
+                voteAverage.setText(String.format(activity.getString(R.string.format_vote_average), movieDetail.getVoteAverage()));
 
-            TextView overview = (TextView)activity.findViewById(R.id.textview_movie_overview);
-            overview.setText(movieDetail.getOverview());
+                TextView overview = (TextView) activity.findViewById(R.id.textview_movie_overview);
+                overview.setText(movieDetail.getOverview());
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+                Toast.makeText(context, String.format(context.getString(R.string.format_error_base_message), "unhandled"), Toast.LENGTH_SHORT).show();
+            }
         }
     }
 

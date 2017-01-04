@@ -31,7 +31,7 @@ public class MoviePosterAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return moviePosters.size();
+        return moviePosters != null ? moviePosters.size() : 0;
     }
 
     @Override

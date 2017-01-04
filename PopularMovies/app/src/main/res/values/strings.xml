@@ -19,4 +19,8 @@
     <string name="format_vote_average">
         %1s/10
     </string>
+
+    <string name="format_error_base_message">
+        An unexpected %1s error has occurred.
+    </string>
 </resources>
