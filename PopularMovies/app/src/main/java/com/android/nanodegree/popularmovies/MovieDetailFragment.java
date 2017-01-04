@@ -24,6 +24,7 @@ public class MovieDetailFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_movie_detail, container, false);
 
         Intent intent = getActivity().getIntent();
@@ -31,6 +32,8 @@ public class MovieDetailFragment extends Fragment {
 
         movieBusiness = new MovieBusiness(getActivity(), null);
         movieBusiness.getMovieDetailByMovieID(movieID);
+
+        setRetainInstance(true);
 
         return view;
     }
