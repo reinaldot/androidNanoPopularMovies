@@ -30,27 +30,24 @@ import java.util.ArrayList;
  */
 
 public class MovieBusiness {
-    private MovieAdapter movieAdapter = null;
-
     private Context context;
     private AsyncTaskDelegate delegate;
 
 
-    public MovieBusiness(AsyncTaskDelegate delegate, MovieAdapter movieAdapter) {
+    public MovieBusiness(AsyncTaskDelegate delegate) {
         this.delegate = delegate;
-        this.movieAdapter = movieAdapter;
 
         if (delegate != null) {
             this.context = (Context) delegate;
         }
     }
 
-    AsyncMovieDBPosterList asyncMovieDBPosterList = new AsyncMovieDBPosterList(movieAdapter);
+    AsyncMovieDBPosterList asyncMovieDBPosterList = new AsyncMovieDBPosterList();
     AsyncMovieDBMovieDetail asyncMovieDBMovieDetail = new AsyncMovieDBMovieDetail();
 
     public void getMovieListBySettings() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences((Context) context);
-        String defaultSort = (context).getResources().getString(R.string.pref_the_movie_db_sort_by_popularity_value);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String defaultSort = context.getResources().getString(R.string.pref_the_movie_db_sort_by_popularity_value);
         String sortValue = preferences.getString(context.getString(R.string.pref_the_movie_db_sort_key), defaultSort);
         asyncMovieDBPosterList.execute(sortValue);
     }
@@ -60,13 +57,6 @@ public class MovieBusiness {
     }
 
     public class AsyncMovieDBPosterList extends AsyncTask<String, Void, ArrayList<Movie>> {
-
-        private MovieAdapter movieAdapter;
-
-        public AsyncMovieDBPosterList(MovieAdapter movieAdapter) {
-            this.movieAdapter = movieAdapter;
-        }
-
         @Override
         protected ArrayList<Movie> doInBackground(String... sortValues) {
             String sortValue = sortValues[0];
@@ -106,9 +96,9 @@ public class MovieBusiness {
                 JSONArray jsonArray = json.getJSONArray("results");
 
                 for (int i = 0; i < jsonArray.length(); i++) {
-                    String movieId = jsonArray.getJSONObject(i).getString("id");
-                    String posterPath = jsonArray.getJSONObject(i).getString("poster_path").replace("/", "");
-                    String movieName = jsonArray.getJSONObject(i).getString("title");
+                    String movieId = jsonArray.getJSONObject(i).optString("id");
+                    String posterPath = jsonArray.getJSONObject(i).optString("poster_path").replace("/", "");
+                    String movieName = jsonArray.getJSONObject(i).optString("title");
                     Uri uri = Uri.parse(Constants.BASE_POSTER_PATH_URL)
                             .buildUpon()
                             .appendPath(Constants.MOVIE_POSTER_SIZE_185)
@@ -188,14 +178,13 @@ public class MovieBusiness {
                 movies = new ArrayList<>();
                 Movie movie;
 
-                String movieId = json.getString("id");
-                String posterPath = json.getString("poster_path").replace("/", "");
-                String movieName = json.getString("title");
-                String releaseDate = json.getString("release_date");
-                String runtime = json.getString("runtime");
-                String voteAverage = json.getString("vote_average");
-                String overview = json.getString("overview");
-
+                String movieId = json.optString("id");
+                String posterPath = json.optString("poster_path").replace("/", "");
+                String movieName = json.optString("title");
+                String releaseDate = json.optString("release_date");
+                String runtime = json.optString("runtime");
+                String voteAverage = json.optString("vote_average");
+                String overview = json.optString("overview");
 
                 Uri uri = Uri.parse(Constants.BASE_POSTER_PATH_URL)
                         .buildUpon()

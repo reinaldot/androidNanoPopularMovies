@@ -38,7 +38,7 @@ public class MovieDetailFragment extends Fragment {
             return view;
         }
 
-        movieBusiness = new MovieBusiness((MovieDetailActivity) activity, null);
+        movieBusiness = new MovieBusiness((MovieDetailActivity) activity);
         movieBusiness.getMovieDetailByMovieID(movieID);
 
         setRetainInstance(true);

@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.GridView;
-
 import com.android.nanodegree.popularmovies.contract.AsyncTaskDelegate;
 import com.android.nanodegree.popularmovies.model.Movie;
 import com.android.nanodegree.popularmovies.ui.adapter.MovieAdapter;

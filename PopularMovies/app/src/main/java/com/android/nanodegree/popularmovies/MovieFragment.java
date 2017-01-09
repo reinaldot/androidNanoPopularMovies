@@ -15,14 +15,12 @@ import android.widget.GridView;
 
 import com.android.nanodegree.popularmovies.business.MovieBusiness;
 import com.android.nanodegree.popularmovies.model.Movie;
-import com.android.nanodegree.popularmovies.ui.adapter.MovieAdapter;
 import com.android.nanodegree.popularmovies.util.Constants;
 import com.android.nanodegree.popularmovies.util.NetworkUtil;
 
 
 public class MovieFragment extends Fragment {
     private MovieBusiness movieBusiness;
-    public static MovieAdapter movieAdapter = null;
     public static GridView movieGridView = null;
 
     public MovieFragment() {
@@ -59,7 +57,7 @@ public class MovieFragment extends Fragment {
             return view;
         }
 
-        movieBusiness = new MovieBusiness((MainActivity) activity, movieAdapter);
+        movieBusiness = new MovieBusiness((MainActivity) activity);
         movieBusiness.getMovieListBySettings();
 
         return view;
