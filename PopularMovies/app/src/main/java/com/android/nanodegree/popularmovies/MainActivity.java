@@ -4,10 +4,16 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.GridView;
 
-public class MainActivity extends AppCompatActivity {
+import com.android.nanodegree.popularmovies.contract.AsyncTaskDelegate;
+import com.android.nanodegree.popularmovies.model.Movie;
+import com.android.nanodegree.popularmovies.ui.adapter.MovieAdapter;
+import com.android.nanodegree.popularmovies.util.Constants;
 
-    private final int SETTING_CHANGED_RESULT = 1;
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity implements AsyncTaskDelegate {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
-                case SETTING_CHANGED_RESULT:
+                case Constants.SETTING_CHANGED_RESULT:
                     Handler handler = new Handler();
                     handler.postDelayed(new Runnable() {
                         @Override
@@ -36,6 +42,17 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }, 0);
             }
+        }
+    }
+
+    @Override
+    public void processFinish(Object output) {
+        if (output != null) {
+            ArrayList<Movie> movies = (ArrayList<Movie>) output;
+            MovieAdapter movieAdapter = new MovieAdapter(this, movies);
+            GridView gridView = (GridView) findViewById(R.id.gridview_movies);
+            gridView.setAdapter(movieAdapter);
+            movieAdapter.notifyDataSetChanged();
         }
     }
 }

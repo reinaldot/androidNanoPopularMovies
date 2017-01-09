@@ -1,11 +1,12 @@
 package com.android.nanodegree.popularmovies.model;
 
 /**
- * Created by rhatori on 03/01/2017.
+ * Created by rhatori on 09/01/2017.
  */
 
-public class MovieDetail {
+public class Movie {
     private String movieID;
+    private String movieName;
     private String title;
     private String posterImageURL;
     private String releaseDate;
@@ -13,20 +14,20 @@ public class MovieDetail {
     private String voteAverage;
     private String overview;
 
-    public String getMovieID() {
-        return movieID;
-    }
-
     public void setMovieID(String movieID) {
         this.movieID = movieID;
     }
 
-    public String getTitle() {
-        return title;
+    public String getMovieID() {
+        return movieID;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public String getMovieName() {
+        return movieName;
+    }
+
+    public void setMovieName(String movieName) {
+        this.movieName = movieName;
     }
 
     public String getPosterImageURL() {
@@ -35,6 +36,14 @@ public class MovieDetail {
 
     public void setPosterImageURL(String posterImageURL) {
         this.posterImageURL = posterImageURL;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getReleaseDate() {

@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.android.nanodegree.popularmovies.R;
-import com.android.nanodegree.popularmovies.model.MoviePoster;
+import com.android.nanodegree.popularmovies.model.Movie;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -19,24 +19,24 @@ import java.util.ArrayList;
  * Created by rhatori on 21/12/2016.
  */
 
-public class MoviePosterAdapter extends BaseAdapter {
+public class MovieAdapter extends BaseAdapter {
 
     private Context context;
-    private ArrayList<MoviePoster> moviePosters;
+    private ArrayList<Movie> movies;
 
-    public MoviePosterAdapter(Context context, ArrayList<MoviePoster> moviePosters) {
+    public MovieAdapter(Context context, ArrayList<Movie> movies) {
         this.context = context;
-        this.moviePosters = moviePosters;
+        this.movies = movies;
     }
 
     @Override
     public int getCount() {
-        return moviePosters != null ? moviePosters.size() : 0;
+        return movies != null ? movies.size() : 0;
     }
 
     @Override
     public Object getItem(int i) {
-        return this.moviePosters.get(i);
+        return this.movies.get(i);
     }
 
     @Override
@@ -60,9 +60,9 @@ public class MoviePosterAdapter extends BaseAdapter {
             imageView = (ImageView)view;
         }
 
-        final MoviePoster poster = moviePosters.get(position);
+        final Movie movie = movies.get(position);
 
-        Picasso.with(context).load(poster.getPosterImageURL()).into(imageView, new Callback() {
+        Picasso.with(context).load(movie.getPosterImageURL()).into(imageView, new Callback() {
             @Override
             public void onSuccess() {
 
@@ -72,7 +72,7 @@ public class MoviePosterAdapter extends BaseAdapter {
             public void onError() {
                         imageView.setVisibility(View.GONE);
                         TextView textViewErrorRight = (TextView)rootView.findViewById(R.id.textview_poster_error);
-                        textViewErrorRight.setText(poster.getMovieName());
+                        textViewErrorRight.setText(movie.getMovieName());
                         textViewErrorRight.setVisibility(View.VISIBLE);
             }
         });

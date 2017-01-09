@@ -14,16 +14,16 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.android.nanodegree.popularmovies.business.MovieBusiness;
-import com.android.nanodegree.popularmovies.model.MoviePoster;
-import com.android.nanodegree.popularmovies.ui.adapter.MoviePosterAdapter;
+import com.android.nanodegree.popularmovies.model.Movie;
+import com.android.nanodegree.popularmovies.ui.adapter.MovieAdapter;
+import com.android.nanodegree.popularmovies.util.Constants;
+import com.android.nanodegree.popularmovies.util.NetworkUtil;
 
 
 public class MovieFragment extends Fragment {
     private MovieBusiness movieBusiness;
-    public static MoviePosterAdapter moviePosterAdapter = null;
+    public static MovieAdapter movieAdapter = null;
     public static GridView movieGridView = null;
-    public static final String MOVIE_ID_KEY = "1";
-    private final int SETTING_CHANGED_RESULT = 1;
 
     public MovieFragment() {
     }
@@ -37,22 +37,29 @@ public class MovieFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        final Activity activity = getActivity();
         View view = inflater.inflate(R.layout.fragment_movie_grid, container, false);
         movieGridView = (GridView) view.findViewById(R.id.gridview_movies);
         movieGridView.setOnItemClickListener(
                 new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                        GridView gridView = (GridView)adapterView;
-                        MoviePoster poster = (MoviePoster)gridView.getAdapter().getItem(i);
-                        String movieID = poster.getMovieID();
-                        Intent intent = new Intent(getActivity(), MovieDetailActivity.class);
-                        intent.putExtra(MOVIE_ID_KEY, movieID);
+                        GridView gridView = (GridView) adapterView;
+                        Movie movie = (Movie) gridView.getAdapter().getItem(i);
+                        String movieID = movie.getMovieID();
+                        Intent intent = new Intent(activity, MovieDetailActivity.class);
+                        intent.putExtra(Constants.MOVIE_ID_KEY, movieID);
                         startActivity(intent);
                     }
                 }
         );
-        movieBusiness = new MovieBusiness(getContext(), moviePosterAdapter);
+
+        if (!NetworkUtil.isNetworkConnected(activity)) {
+            NetworkUtil.showNetworkUnavailableError(activity, activity.findViewById(R.id.container));
+            return view;
+        }
+
+        movieBusiness = new MovieBusiness((MainActivity) activity, movieAdapter);
         movieBusiness.getMovieListBySettings();
 
         return view;
@@ -72,7 +79,7 @@ public class MovieFragment extends Fragment {
             case R.id.action_settings:
                 Activity rootActivity = getActivity();
                 Intent intent = new Intent(getActivity(), SettingsActivity.class);
-                rootActivity.startActivityForResult(intent, SETTING_CHANGED_RESULT);
+                rootActivity.startActivityForResult(intent, Constants.SETTING_CHANGED_RESULT);
                 return true;
         }
 

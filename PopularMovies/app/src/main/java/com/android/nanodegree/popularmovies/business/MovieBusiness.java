@@ -6,18 +6,15 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.nanodegree.popularmovies.R;
-import com.android.nanodegree.popularmovies.model.MovieDetail;
-import com.android.nanodegree.popularmovies.model.MoviePoster;
+import com.android.nanodegree.popularmovies.contract.AsyncTaskDelegate;
+import com.android.nanodegree.popularmovies.model.Movie;
 import com.android.nanodegree.popularmovies.repository.MovieDBRepository;
-import com.android.nanodegree.popularmovies.ui.adapter.MoviePosterAdapter;
+import com.android.nanodegree.popularmovies.ui.adapter.MovieAdapter;
+import com.android.nanodegree.popularmovies.util.Constants;
 import com.android.nanodegree.popularmovies.util.JsonUtil;
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,25 +30,27 @@ import java.util.ArrayList;
  */
 
 public class MovieBusiness {
+    private MovieAdapter movieAdapter = null;
 
-    private MoviePosterAdapter moviePosterAdapter = null;
+    private Context context;
+    private AsyncTaskDelegate delegate;
 
-    public MovieBusiness(Context context, MoviePosterAdapter moviePosterAdapter) {
-        this.context = context;
-        this.moviePosterAdapter = moviePosterAdapter;
+
+    public MovieBusiness(AsyncTaskDelegate delegate, MovieAdapter movieAdapter) {
+        this.delegate = delegate;
+        this.movieAdapter = movieAdapter;
+
+        if (delegate != null) {
+            this.context = (Context) delegate;
+        }
     }
 
-    Context context;
-
-    AsyncMovieDBPosterList asyncMovieDBPosterList = new AsyncMovieDBPosterList(moviePosterAdapter);
+    AsyncMovieDBPosterList asyncMovieDBPosterList = new AsyncMovieDBPosterList(movieAdapter);
     AsyncMovieDBMovieDetail asyncMovieDBMovieDetail = new AsyncMovieDBMovieDetail();
 
-    final String BASE_POSTER_PATH_URL = "https://image.tmdb.org/t/p/";
-    final String MOVIE_POSTER_SIZE_185 = "w185";
-
     public void getMovieListBySettings() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String defaultSort = context.getResources().getString(R.string.pref_the_movie_db_sort_by_popularity_value);
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences((Context) context);
+        String defaultSort = (context).getResources().getString(R.string.pref_the_movie_db_sort_by_popularity_value);
         String sortValue = preferences.getString(context.getString(R.string.pref_the_movie_db_sort_key), defaultSort);
         asyncMovieDBPosterList.execute(sortValue);
     }
@@ -60,19 +59,20 @@ public class MovieBusiness {
         this.asyncMovieDBMovieDetail.execute(movieID);
     }
 
-    public class AsyncMovieDBPosterList extends AsyncTask<String, Void, ArrayList<MoviePoster>> {
+    public class AsyncMovieDBPosterList extends AsyncTask<String, Void, ArrayList<Movie>> {
 
-        private MoviePosterAdapter moviePosterAdapter;
+        private MovieAdapter movieAdapter;
 
-        public AsyncMovieDBPosterList(MoviePosterAdapter moviePosterAdapter) {
-            this.moviePosterAdapter = moviePosterAdapter;
+        public AsyncMovieDBPosterList(MovieAdapter movieAdapter) {
+            this.movieAdapter = movieAdapter;
         }
 
         @Override
-        protected ArrayList<MoviePoster> doInBackground(String... sortValues) {
+        protected ArrayList<Movie> doInBackground(String... sortValues) {
             String sortValue = sortValues[0];
             MovieDBRepository repository = new MovieDBRepository();
-            InputStream inputStream = null;
+            InputStream inputStream;
+
             try {
                 inputStream = repository.getMovieListBySettings(sortValue);
                 if (inputStream == null) {
@@ -96,12 +96,12 @@ public class MovieBusiness {
                 return null;
             }
 
-            ArrayList<MoviePoster> moviePosters;
+            ArrayList<Movie> movies;
 
             try {
-            JSONObject json = JsonUtil.getJSONObject(inputStream);
-            moviePosters = new ArrayList<>();
-            MoviePoster moviePoster;
+                JSONObject json = JsonUtil.getJSONObject(inputStream);
+                movies = new ArrayList<>();
+                Movie movie;
 
                 JSONArray jsonArray = json.getJSONArray("results");
 
@@ -109,17 +109,17 @@ public class MovieBusiness {
                     String movieId = jsonArray.getJSONObject(i).getString("id");
                     String posterPath = jsonArray.getJSONObject(i).getString("poster_path").replace("/", "");
                     String movieName = jsonArray.getJSONObject(i).getString("title");
-                    Uri uri = Uri.parse(BASE_POSTER_PATH_URL)
+                    Uri uri = Uri.parse(Constants.BASE_POSTER_PATH_URL)
                             .buildUpon()
-                            .appendPath(MOVIE_POSTER_SIZE_185)
+                            .appendPath(Constants.MOVIE_POSTER_SIZE_185)
                             .appendPath(posterPath)
                             .build();
 
-                    moviePoster = new MoviePoster();
-                    moviePoster.setMovieID(movieId);
-                    moviePoster.setPosterImageURL(uri.toString());
-                    moviePoster.setMovieName(movieName);
-                    moviePosters.add(moviePoster);
+                    movie = new Movie();
+                    movie.setMovieID(movieId);
+                    movie.setPosterImageURL(uri.toString());
+                    movie.setMovieName(movieName);
+                    movies.add(movie);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -140,21 +140,22 @@ public class MovieBusiness {
                 });
                 return null;
             }
-            return moviePosters;
+            return movies;
         }
 
         @Override
-        protected void onPostExecute(ArrayList<MoviePoster> moviePosters) {
-            moviePosterAdapter = new MoviePosterAdapter(context, moviePosters);
-            GridView gridView = (GridView) ((Activity) context).findViewById(R.id.gridview_movies);
-            gridView.setAdapter(moviePosterAdapter);
-            moviePosterAdapter.notifyDataSetChanged();
+        protected void onPostExecute(ArrayList<Movie> movies) {
+            super.onPostExecute(movies);
+
+            if (delegate != null) {
+                delegate.processFinish(movies);
+            }
         }
     }
 
-    public class AsyncMovieDBMovieDetail extends AsyncTask<String, Void, ArrayList<MovieDetail>> {
+    public class AsyncMovieDBMovieDetail extends AsyncTask<String, Void, ArrayList<Movie>> {
         @Override
-        protected ArrayList<MovieDetail> doInBackground(String... movieIDs) {
+        protected ArrayList<Movie> doInBackground(String... movieIDs) {
             String movieID = movieIDs[0];
             MovieDBRepository repository = new MovieDBRepository();
             InputStream inputStream;
@@ -180,12 +181,12 @@ public class MovieBusiness {
                 return null;
             }
 
-            ArrayList<MovieDetail> movieDetails;
+            ArrayList<Movie> movies;
 
             try {
-            JSONObject json = JsonUtil.getJSONObject(inputStream);
-            movieDetails = new ArrayList<>();
-            MovieDetail movieDetail;
+                JSONObject json = JsonUtil.getJSONObject(inputStream);
+                movies = new ArrayList<>();
+                Movie movie;
 
                 String movieId = json.getString("id");
                 String posterPath = json.getString("poster_path").replace("/", "");
@@ -196,22 +197,22 @@ public class MovieBusiness {
                 String overview = json.getString("overview");
 
 
-                Uri uri = Uri.parse(BASE_POSTER_PATH_URL)
+                Uri uri = Uri.parse(Constants.BASE_POSTER_PATH_URL)
                         .buildUpon()
-                        .appendPath(MOVIE_POSTER_SIZE_185)
+                        .appendPath(Constants.MOVIE_POSTER_SIZE_185)
                         .appendPath(posterPath)
                         .build();
 
-                movieDetail = new MovieDetail();
-                movieDetail.setMovieID(movieId);
-                movieDetail.setPosterImageURL(uri.toString());
-                movieDetail.setTitle(movieName);
-                movieDetail.setReleaseDate(releaseDate);
-                movieDetail.setRuntime(runtime);
-                movieDetail.setVoteAverage(voteAverage);
-                movieDetail.setOverview(overview);
+                movie = new Movie();
+                movie.setMovieID(movieId);
+                movie.setPosterImageURL(uri.toString());
+                movie.setTitle(movieName);
+                movie.setReleaseDate(releaseDate);
+                movie.setRuntime(runtime);
+                movie.setVoteAverage(voteAverage);
+                movie.setOverview(overview);
 
-                movieDetails.add(movieDetail);
+                movies.add(movie);
             } catch (JSONException e) {
                 e.printStackTrace();
                 ((Activity) context).runOnUiThread(new Runnable() {
@@ -231,36 +232,15 @@ public class MovieBusiness {
                 });
                 return null;
             }
-            return movieDetails;
+            return movies;
         }
 
         @Override
-        protected void onPostExecute(ArrayList<MovieDetail> movieDetails) {
-            try {
-                MovieDetail movieDetail = movieDetails.get(0);
-                Activity activity = ((Activity) context);
+        protected void onPostExecute(ArrayList<Movie> movies) {
+            super.onPostExecute(movies);
 
-                activity.setTitle(movieDetail.getTitle());
-
-                ImageView imageView = (ImageView) activity.findViewById(R.id.imageview_poster);
-                Picasso.with(context).load(movieDetail.getPosterImageURL()).into(imageView);
-
-                TextView movieYear = (TextView) activity.findViewById(R.id.textview_movie_year);
-                movieYear.setText(movieDetail.getReleaseDate().substring(0, 4));
-
-                TextView runtime = (TextView) activity.findViewById(R.id.textview_movie_runtime);
-                runtime.setText(String.format(activity.getString(R.string.format_runtime), movieDetail.getRuntime()));
-
-                TextView voteAverage = (TextView) activity.findViewById(R.id.textview_movie_vote_average);
-                voteAverage.setText(String.format(activity.getString(R.string.format_vote_average), movieDetail.getVoteAverage()));
-
-                TextView overview = (TextView) activity.findViewById(R.id.textview_movie_overview);
-                overview.setText(movieDetail.getOverview());
-            }
-            catch(Exception e)
-            {
-                e.printStackTrace();
-                Toast.makeText(context, String.format(context.getString(R.string.format_error_base_message), "unhandled"), Toast.LENGTH_SHORT).show();
+            if (delegate != null) {
+                delegate.processFinish(movies);
             }
         }
     }

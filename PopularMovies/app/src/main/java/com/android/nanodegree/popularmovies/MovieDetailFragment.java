@@ -1,17 +1,17 @@
 package com.android.nanodegree.popularmovies;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.android.nanodegree.popularmovies.business.MovieBusiness;
+import com.android.nanodegree.popularmovies.util.Constants;
+import com.android.nanodegree.popularmovies.util.NetworkUtil;
 
 /**
  * Created by rhatori on 03/01/2017.
@@ -27,10 +27,18 @@ public class MovieDetailFragment extends Fragment {
         super.onCreateView(inflater, container, savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_movie_detail, container, false);
 
-        Intent intent = getActivity().getIntent();
-        final String movieID = intent.getStringExtra(MovieFragment.MOVIE_ID_KEY);
+        Activity activity = getActivity();
 
-        movieBusiness = new MovieBusiness(getActivity(), null);
+        Intent intent = activity.getIntent();
+        final String movieID = intent.getStringExtra(Constants.MOVIE_ID_KEY);
+
+
+        if (!NetworkUtil.isNetworkConnected(activity)) {
+            NetworkUtil.showNetworkUnavailableError(activity, activity.findViewById(R.id.container_movie_detail));
+            return view;
+        }
+
+        movieBusiness = new MovieBusiness((MovieDetailActivity) activity, null);
         movieBusiness.getMovieDetailByMovieID(movieID);
 
         setRetainInstance(true);
