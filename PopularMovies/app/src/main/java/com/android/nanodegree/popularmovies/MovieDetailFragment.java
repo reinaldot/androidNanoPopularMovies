@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.android.nanodegree.popularmovies.business.MovieBusiness;
+import com.android.nanodegree.popularmovies.model.Movie;
 import com.android.nanodegree.popularmovies.util.Constants;
 import com.android.nanodegree.popularmovies.util.NetworkUtil;
 
@@ -30,7 +31,7 @@ public class MovieDetailFragment extends Fragment {
         Activity activity = getActivity();
 
         Intent intent = activity.getIntent();
-        final String movieID = intent.getStringExtra(Constants.MOVIE_ID_KEY);
+        final Movie movie = intent.getParcelableExtra(Movie.MOVIE_ID_KEY);
 
 
         if (!NetworkUtil.isNetworkConnected(activity)) {
@@ -39,7 +40,7 @@ public class MovieDetailFragment extends Fragment {
         }
 
         movieBusiness = new MovieBusiness((MovieDetailActivity) activity);
-        movieBusiness.getMovieDetailByMovieID(movieID);
+        movieBusiness.getMovieDetailByMovieID(movie.getMovieID());
 
         setRetainInstance(true);
 

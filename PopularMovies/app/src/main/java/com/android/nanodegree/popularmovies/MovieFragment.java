@@ -44,9 +44,8 @@ public class MovieFragment extends Fragment {
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                         GridView gridView = (GridView) adapterView;
                         Movie movie = (Movie) gridView.getAdapter().getItem(i);
-                        String movieID = movie.getMovieID();
                         Intent intent = new Intent(activity, MovieDetailActivity.class);
-                        intent.putExtra(Constants.MOVIE_ID_KEY, movieID);
+                        intent.putExtra(Movie.MOVIE_ID_KEY, movie);
                         startActivity(intent);
                     }
                 }

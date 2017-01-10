@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Parcel;
 import android.preference.PreferenceManager;
 import android.widget.Toast;
 
@@ -191,6 +192,7 @@ public class MovieBusiness {
                         .appendPath(Constants.MOVIE_POSTER_SIZE_185)
                         .appendPath(posterPath)
                         .build();
+
 
                 movie = new Movie();
                 movie.setMovieID(movieId);

@@ -20,6 +20,10 @@ import java.util.ArrayList;
  */
 
 public class MovieAdapter extends BaseAdapter {
+    static class ViewHolderItem {
+        ImageView imageView;
+        TextView textView;
+    }
 
     private Context context;
     private ArrayList<Movie> movies;
@@ -46,23 +50,21 @@ public class MovieAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View view, ViewGroup viewGroup) {
-
-        final ImageView imageView;
-        final View rootView;
+        final ViewHolderItem viewHolder;
 
         if (view == null) {
-            rootView = LayoutInflater.from(context).inflate(R.layout.grid_item, viewGroup,false);
-            imageView = (ImageView)rootView.findViewById(R.id.imageview_poster);
-        }
-        else
-        {
-            rootView = null;
-            imageView = (ImageView)view;
+            viewHolder = new ViewHolderItem();
+            view = LayoutInflater.from(context).inflate(R.layout.grid_item, viewGroup, false);
+            viewHolder.imageView = (ImageView) view.findViewById(R.id.imageview_poster);
+            viewHolder.textView = (TextView) view.findViewById(R.id.textview_poster_error);
+            view.setTag(viewHolder);
+        } else {
+            viewHolder = (ViewHolderItem) view.getTag();
         }
 
         final Movie movie = movies.get(position);
 
-        Picasso.with(context).load(movie.getPosterImageURL()).into(imageView, new Callback() {
+        Picasso.with(context).load(movie.getPosterImageURL()).into(viewHolder.imageView, new Callback() {
             @Override
             public void onSuccess() {
 
@@ -70,13 +72,13 @@ public class MovieAdapter extends BaseAdapter {
 
             @Override
             public void onError() {
-                        imageView.setVisibility(View.GONE);
-                        TextView textViewErrorRight = (TextView)rootView.findViewById(R.id.textview_poster_error);
-                        textViewErrorRight.setText(movie.getMovieName());
-                        textViewErrorRight.setVisibility(View.VISIBLE);
+                viewHolder.imageView.setVisibility(View.GONE);
+                TextView textViewError = viewHolder.textView;
+                textViewError.setText(movie.getMovieName());
+                textViewError.setVisibility(View.VISIBLE);
             }
         });
 
-        return imageView;
+        return view;
     }
 }
